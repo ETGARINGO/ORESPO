@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <base target="_self">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO9 KAPIT-BISIG</title>
+    <title>PRO9 TACTICAL COMMAND</title>
     <style>
         :root {
-            --primary: #0070ff;
+            --police-red: #ff0000;
+            --police-blue: #0044ff;
             --cyan: #38bdf8;
-            --bg: #020617;
+            --bg: #00050a;
         }
 
         body, html {
@@ -17,11 +18,26 @@
             width: 100%; height: 100%;
             background: var(--bg);
             color: white;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             overflow: hidden;
         }
 
-        /* --- THUNDER/LIGHTNING (FIRST PAGE ONLY) --- */
+        /* --- POLICE FLUSHING EFFECT (STROBE) --- */
+        .police-strobe {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.15;
+            animation: police-flash 0.8s infinite steps(2);
+        }
+
+        @keyframes police-flash {
+            0% { background: var(--police-red); box-shadow: inset 0 0 100px var(--police-red); }
+            50% { background: var(--police-blue); box-shadow: inset 0 0 100px var(--police-blue); }
+        }
+
+        /* --- THUNDER/LIGHTNING LAYER --- */
         #lightning-layer {
             position: fixed;
             inset: 0;
@@ -31,26 +47,14 @@
             pointer-events: none;
         }
 
-        @keyframes lightning-flash {
-            0% { opacity: 0; }
-            10% { opacity: 0.5; }
-            12% { opacity: 0.1; }
-            14% { opacity: 0.8; }
-            20% { opacity: 0; }
+        @keyframes thunder-strike {
+            0%, 10%, 20% { opacity: 0; }
+            11% { opacity: 0.4; }
+            13% { opacity: 0.1; }
+            15% { opacity: 0.7; }
         }
 
-        /* --- TACTICAL BACKGROUND --- */
-        .grid-overlay {
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(rgba(0, 112, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 112, 255, 0.1) 1px, transparent 1px);
-            background-size: 45px 45px;
-            z-index: 1;
-        }
-
-        /* --- COVER PAGE --- */
+        /* --- CENTRAL HUD --- */
         #cover-page {
             position: relative;
             z-index: 10;
@@ -59,138 +63,147 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
+            background: radial-gradient(circle, rgba(0, 112, 255, 0.1) 0%, transparent 70%);
+            transition: transform 1s cubic-bezier(0.9, 0, 0.1, 1), opacity 0.8s;
         }
 
+        /* LOGO TACTICAL ANIMATION */
         .logo-trigger {
             position: relative;
-            width: 250px;
-            height: 250px;
+            width: 280px;
+            height: 280px;
             cursor: pointer;
-            transition: transform 0.4s ease;
-        }
-
-        .logo-trigger:hover {
-            transform: scale(1.05);
-        }
-
-        .logo-trigger:active {
-            transform: scale(0.95);
+            z-index: 10;
         }
 
         .logo-img {
             width: 100%; height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 15px var(--primary));
-            animation: breathe 3s infinite ease-in-out;
-            position: relative;
-            z-index: 5;
+            filter: drop-shadow(0 0 15px var(--cyan));
+            animation: glitch 4s infinite;
         }
 
-        /* Radar pulses */
-        .sonar {
+        /* SCANNING RING */
+        .scanner-ring {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%; height: 100%;
+            width: 110%; height: 110%;
             border: 2px solid var(--cyan);
             border-radius: 50%;
-            animation: sonar-expand 3s infinite linear;
-            opacity: 0;
+            border-top-color: transparent;
+            animation: spin 1s infinite linear;
         }
 
-        @keyframes sonar-expand {
-            0% { width: 100%; height: 100%; opacity: 0.8; }
-            100% { width: 300%; height: 300%; opacity: 0; }
+        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+        
+        @keyframes glitch {
+            0%, 100% { transform: translate(0); }
+            1% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
+            2% { transform: translate(5px, -2px); filter: hue-rotate(180deg); }
+            3% { transform: translate(0); }
         }
 
-        @keyframes breathe {
-            0%, 100% { filter: brightness(1) drop-shadow(0 0 10px var(--primary)); }
-            50% { filter: brightness(1.3) drop-shadow(0 0 25px var(--cyan)); }
+        /* --- TEXT STACK --- */
+        .tactical-text {
+            text-align: center;
+            margin-top: 30px;
+            text-shadow: 0 0 10px var(--cyan);
         }
 
-        .instruction {
-            margin-top: 25px;
-            letter-spacing: 5px;
-            font-size: 0.8rem;
-            color: var(--cyan);
-            text-transform: uppercase;
-            animation: blink 2s infinite;
+        .status-bar {
+            width: 300px;
+            height: 4px;
+            background: #111;
+            margin-top: 15px;
+            border: 1px solid #333;
+            overflow: hidden;
         }
 
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .status-progress {
+            width: 40%;
+            height: 100%;
+            background: var(--cyan);
+            animation: pulse-load 2s infinite ease-in-out;
+        }
 
-        /* --- APP IFRAME (THE "NO EXIT" ZONE) --- */
+        @keyframes pulse-load {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+
+        /* --- MAIN IFRAME (THE "NO EXIT" ZONE) --- */
         #app-frame {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             border: none;
             display: none;
-            z-index: 50;
+            z-index: 200;
         }
 
-        /* --- TRANSITION CLASSES --- */
-        .fade-out {
+        .hidden-ui {
+            transform: translateY(-100vh);
             opacity: 0;
-            transform: scale(1.5);
-            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
+    <div class="police-strobe"></div>
     <div id="lightning-layer"></div>
-    <div class="grid-overlay"></div>
 
     <div id="cover-page">
-        <div class="logo-trigger" onclick="initializeSystem()">
-            <div class="sonar" style="animation-delay: 0s;"></div>
-            <div class="sonar" style="animation-delay: 1s;"></div>
-            <img src="KAPIT BISIG.png" class="logo-img" alt="Click Logo to Enter">
+        <div class="logo-trigger" onclick="engageSystem()">
+            <div class="scanner-ring"></div>
+            <img src="KAPIT BISIG.png" class="logo-img" alt="SECURE ACCESS">
         </div>
         
-        <h1 style="letter-spacing: 12px; margin: 20px 0 5px; font-weight: 900;">KAPIT-BISIG</h1>
-        <div class="instruction">Click Logo to Initialize Secure Connection</div>
+        <div class="tactical-text">
+            <h1 style="letter-spacing: 15px; margin:0;">PRO9 COMMAND</h1>
+            <p style="color: var(--cyan); font-size: 12px; margin-top: 5px;">STATUS: AWAITING BIOMETRIC OVERRIDE</p>
+            <div class="status-bar"><div class="status-progress"></div></div>
+        </div>
     </div>
 
     <iframe id="app-frame" src=""></iframe>
 
     <script>
-        // 1. Thunder Logic (Runs on First Page only)
-        let thunderActive = true;
-        function runThunder() {
-            if(!thunderActive) return;
-            const delay = Math.random() * 7000 + 3000;
+        // 1. Thunder Strobe Logic (Entrance Only)
+        function startThunder() {
+            const delay = Math.random() * 6000 + 4000;
             setTimeout(() => {
-                if(!thunderActive) return;
-                const flash = document.getElementById('lightning-layer');
-                flash.style.animation = 'none';
-                void flash.offsetWidth;
-                flash.style.animation = 'lightning-flash 0.6s ease-out';
-                runThunder();
+                const layer = document.getElementById('lightning-layer');
+                layer.style.animation = 'none';
+                void layer.offsetWidth;
+                layer.style.animation = 'thunder-strike 0.5s ease-out';
+                startThunder();
             }, delay);
         }
-        runThunder();
+        startThunder();
 
-        // 2. Entrance Logic
-        function initializeSystem() {
-            thunderActive = false; // Stop lightning once clicked
+        // 2. Engagement Logic (No Exit Transition)
+        function engageSystem() {
             const cover = document.getElementById('cover-page');
             const frame = document.getElementById('app-frame');
-            const scriptUrl = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
+            const strobe = document.querySelector('.police-strobe');
+            const url = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
 
-            // Add fade-out effect
-            cover.classList.add('fade-out');
+            // Stop animations for transition
+            strobe.style.opacity = '0.05';
+            
+            // Execute "No Exit" slide
+            cover.classList.add('hidden-ui');
 
-            // Load the App in the background
-            frame.src = scriptUrl;
+            // Set frame source
+            frame.src = url;
 
-            // Switch to the inframe after animation
             setTimeout(() => {
                 cover.style.display = 'none';
                 frame.style.display = 'block';
-                document.getElementById('lightning-layer').style.display = 'none';
+                // Final Strobe adjustment to not distract from app
+                strobe.style.zIndex = "201"; 
+                strobe.style.opacity = "0.02"; 
             }, 1000);
         }
     </script>
