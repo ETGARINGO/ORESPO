@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <base target="_self">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO9 KAPIT-BISIG | SECURE ACCESS</title>
+    <title>PRO9 KAPIT-BISIG</title>
     <style>
         :root {
             --primary: #0070ff;
@@ -21,8 +21,8 @@
             overflow: hidden;
         }
 
-        /* --- LIGHTNING EFFECT --- */
-        .thunder-overlay {
+        /* --- THUNDER/LIGHTNING (FIRST PAGE ONLY) --- */
+        #lightning-layer {
             position: fixed;
             inset: 0;
             background: #fff;
@@ -31,28 +31,27 @@
             pointer-events: none;
         }
 
-        @keyframes strike {
+        @keyframes lightning-flash {
             0% { opacity: 0; }
-            10% { opacity: 0.4; }
-            15% { opacity: 0.1; }
-            20% { opacity: 0.6; }
-            25% { opacity: 0; }
-            100% { opacity: 0; }
+            10% { opacity: 0.5; }
+            12% { opacity: 0.1; }
+            14% { opacity: 0.8; }
+            20% { opacity: 0; }
         }
 
-        /* --- BACKGROUND GRID --- */
-        .grid {
+        /* --- TACTICAL BACKGROUND --- */
+        .grid-overlay {
             position: fixed;
             inset: 0;
             background-image: 
                 linear-gradient(rgba(0, 112, 255, 0.1) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 112, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-size: 45px 45px;
             z-index: 1;
         }
 
-        /* --- ENTRANCE CONTAINER --- */
-        #entrance-screen {
+        /* --- COVER PAGE --- */
+        #cover-page {
             position: relative;
             z-index: 10;
             height: 100vh;
@@ -60,28 +59,35 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s;
+            transition: all 1.2s cubic-bezier(0.7, 0, 0.3, 1);
         }
 
-        .logo-box {
+        .logo-trigger {
             position: relative;
-            width: 220px;
-            height: 220px;
-            margin-bottom: 30px;
+            width: 250px;
+            height: 250px;
+            cursor: pointer;
+            transition: transform 0.4s ease;
         }
 
-        .logo-main {
+        .logo-trigger:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-trigger:active {
+            transform: scale(0.95);
+        }
+
+        .logo-img {
             width: 100%; height: 100%;
             object-fit: contain;
-            filter: drop-shadow(0 0 20px var(--primary));
-            animation: breathe 4s infinite ease-in-out;
+            filter: drop-shadow(0 0 15px var(--primary));
+            animation: breathe 3s infinite ease-in-out;
+            position: relative;
+            z-index: 5;
         }
 
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 10px var(--primary)); }
-            50% { transform: scale(1.05); filter: brightness(1.3) drop-shadow(0 0 25px var(--cyan)); }
-        }
-
+        /* Radar pulses */
         .sonar {
             position: absolute;
             top: 50%; left: 50%;
@@ -89,49 +95,33 @@
             width: 100%; height: 100%;
             border: 2px solid var(--cyan);
             border-radius: 50%;
-            animation: sonar-pulse 4s infinite linear;
+            animation: sonar-expand 3s infinite linear;
             opacity: 0;
         }
 
-        @keyframes sonar-pulse {
+        @keyframes sonar-expand {
             0% { width: 100%; height: 100%; opacity: 0.8; }
-            100% { width: 350%; height: 350%; opacity: 0; }
+            100% { width: 300%; height: 300%; opacity: 0; }
         }
 
-        .title {
-            font-size: 2.5rem;
-            letter-spacing: 15px;
-            font-weight: 900;
-            text-transform: uppercase;
-            margin: 0;
-            background: linear-gradient(to bottom, #fff, #64748b);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes breathe {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 10px var(--primary)); }
+            50% { filter: brightness(1.3) drop-shadow(0 0 25px var(--cyan)); }
         }
 
-        .btn-proceed {
-            margin-top: 50px;
-            padding: 15px 45px;
-            background: transparent;
-            border: 1px solid var(--primary);
+        .instruction {
+            margin-top: 25px;
+            letter-spacing: 5px;
+            font-size: 0.8rem;
             color: var(--cyan);
-            font-weight: bold;
-            letter-spacing: 3px;
             text-transform: uppercase;
-            cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            transition: 0.3s;
+            animation: blink 2s infinite;
         }
 
-        .btn-proceed:hover {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 0 30px var(--primary);
-            transform: scale(1.1);
-        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* --- FULL VIEW IFRAME (HIDDEN BY DEFAULT) --- */
-        #main-app-frame {
+        /* --- APP IFRAME (THE "NO EXIT" ZONE) --- */
+        #app-frame {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
@@ -140,59 +130,68 @@
             z-index: 50;
         }
 
-        .hidden { opacity: 0; pointer-events: none; transform: scale(1.2) !important; }
+        /* --- TRANSITION CLASSES --- */
+        .fade-out {
+            opacity: 0;
+            transform: scale(1.5);
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
 
-    <div class="thunder-overlay" id="thunder"></div>
-    <div class="grid"></div>
+    <div id="lightning-layer"></div>
+    <div class="grid-overlay"></div>
 
-    <div id="entrance-screen">
-        <div class="logo-box">
-            <div class="sonar"></div>
-            <div class="sonar" style="animation-delay: 1.5s"></div>
-            <img src="KAPIT BISIG.png" class="logo-main" alt="Logo">
+    <div id="cover-page">
+        <div class="logo-trigger" onclick="initializeSystem()">
+            <div class="sonar" style="animation-delay: 0s;"></div>
+            <div class="sonar" style="animation-delay: 1s;"></div>
+            <img src="KAPIT BISIG.png" class="logo-img" alt="Click Logo to Enter">
         </div>
-        <h1 class="title">KAPIT-BISIG</h1>
-        <p style="letter-spacing: 5px; color: var(--cyan); font-size: 0.8rem;">REGIONWIDE PROGRAM COMMAND</p>
         
-        <button class="btn-proceed" onclick="launchSystem()">Establish Connection</button>
+        <h1 style="letter-spacing: 12px; margin: 20px 0 5px; font-weight: 900;">KAPIT-BISIG</h1>
+        <div class="instruction">Click Logo to Initialize Secure Connection</div>
     </div>
 
-    <iframe id="main-app-frame" src=""></iframe>
+    <iframe id="app-frame" src=""></iframe>
 
     <script>
-        // Random Thunder Logic
-        function triggerThunder() {
-            const strikeDelay = Math.random() * 8000 + 2000;
+        // 1. Thunder Logic (Runs on First Page only)
+        let thunderActive = true;
+        function runThunder() {
+            if(!thunderActive) return;
+            const delay = Math.random() * 7000 + 3000;
             setTimeout(() => {
-                const thunder = document.getElementById('thunder');
-                thunder.style.animation = 'none';
-                void thunder.offsetWidth; // Trigger reflow
-                thunder.style.animation = 'strike 0.5s ease-out';
-                triggerThunder();
-            }, strikeDelay);
+                if(!thunderActive) return;
+                const flash = document.getElementById('lightning-layer');
+                flash.style.animation = 'none';
+                void flash.offsetWidth;
+                flash.style.animation = 'lightning-flash 0.6s ease-out';
+                runThunder();
+            }, delay);
         }
-        triggerThunder();
+        runThunder();
 
-        // System Launch Logic
-        function launchSystem() {
-            const entrance = document.getElementById('entrance-screen');
-            const frame = document.getElementById('main-app-frame');
-            const targetUrl = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
+        // 2. Entrance Logic
+        function initializeSystem() {
+            thunderActive = false; // Stop lightning once clicked
+            const cover = document.getElementById('cover-page');
+            const frame = document.getElementById('app-frame');
+            const scriptUrl = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
 
-            // 1. Start transition
-            entrance.classList.add('hidden');
+            // Add fade-out effect
+            cover.classList.add('fade-out');
 
-            // 2. Load URL into iframe
-            frame.src = targetUrl;
+            // Load the App in the background
+            frame.src = scriptUrl;
 
-            // 3. Show Iframe
+            // Switch to the inframe after animation
             setTimeout(() => {
-                entrance.style.display = 'none';
+                cover.style.display = 'none';
                 frame.style.display = 'block';
-            }, 800);
+                document.getElementById('lightning-layer').style.display = 'none';
+            }, 1000);
         }
     </script>
 </body>
