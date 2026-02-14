@@ -1,67 +1,226 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <base target="_self">
   <style>
-    body {
-      background: #0f172a; /* Deep tech blue */
+    :root {
+      --primary-blue: #0070ff;
+      --accent-cyan: #38bdf8;
+      --bg-dark: #020617;
+      --glow: rgba(0, 112, 255, 0.6);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-dark);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* --- TACTICAL GRID & SCANLINE --- */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(0, 112, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 112, 255, 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 1;
+    }
+
+    .scanline {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.03), transparent);
+      height: 10%;
+      width: 100%;
+      animation: scan 4s linear infinite;
+      z-index: 2;
+    }
+
+    @keyframes scan { from { top: -10%; } to { top: 110%; } }
+
+    /* --- CENTRAL HUB --- */
+    .opening-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
+      animation: zoomIn 1.5s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
-    /* The "Flushing" / Pulsing Logo Container */
-    .logo-container {
+    @keyframes zoomIn {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    /* --- LOGO WITH SONAR RINGS --- */
+    .logo-wrapper {
       position: relative;
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: url('LOGO.PNG') no-repeat center;
-      background-size: contain;
-      z-index: 2;
-      box-shadow: 0 0 20px rgba(0, 102, 255, 0.5);
-      animation: pulse-glow 2s infinite ease-in-out;
+      width: 180px;
+      height: 180px;
+      margin-bottom: 40px;
     }
 
-    /* Outer Ring Animation */
-    .logo-container::before {
-      content: '';
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 15px var(--primary-blue));
+      animation: breathe 3s infinite ease-in-out;
+      z-index: 5;
+      position: relative;
+    }
+
+    .sonar {
       position: absolute;
-      top: -10px; left: -10px; right: -10px; bottom: -10px;
-      border: 2px solid rgba(0, 195, 255, 0.6);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%; height: 100%;
+      border: 2px solid var(--accent-cyan);
       border-radius: 50%;
-      animation: flush-ring 1.5s infinite linear;
+      animation: sonar-pulse 3s infinite linear;
+      opacity: 0;
+    }
+    .sonar-2 { animation-delay: 1s; }
+    .sonar-3 { animation-delay: 2s; }
+
+    @keyframes sonar-pulse {
+      0% { width: 100%; height: 100%; opacity: 0.6; }
+      100% { width: 300%; height: 300%; opacity: 0; }
     }
 
-    @keyframes pulse-glow {
-      0% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 102, 255, 0.5); }
-      50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 195, 255, 0.8); }
-      100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 102, 255, 0.5); }
+    @keyframes breathe {
+      0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 10px var(--primary-blue)); }
+      50% { transform: scale(1.05); filter: brightness(1.2) drop-shadow(0 0 25px var(--accent-cyan)); }
     }
 
-    @keyframes flush-ring {
-      0% { transform: scale(1); opacity: 1; }
-      100% { transform: scale(1.3); opacity: 0; }
-    }
-
-    h1 {
-      color: white;
+    /* --- TEXT STYLING --- */
+    .main-title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 12px;
       text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-top: 30px;
-      text-align: center;
-      text-shadow: 0 0 10px rgba(0, 195, 255, 0.5);
+      background: linear-gradient(to bottom, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
     }
+
+    .sub-title {
+      font-size: 1rem;
+      letter-spacing: 6px;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 50px;
+    }
+
+    /* --- TACTICAL ENTER BUTTON --- */
+    .enter-btn {
+      position: relative;
+      padding: 15px 40px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent-cyan);
+      background: transparent;
+      border: 1px solid var(--primary-blue);
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      overflow: hidden;
+      transition: 0.4s;
+      clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%);
+    }
+
+    .enter-btn:hover {
+      background: var(--primary-blue);
+      color: white;
+      box-shadow: 0 0 30px var(--glow);
+      transform: scale(1.1);
+    }
+
+    /* Lightning Flash */
+    .thunder {
+      position: fixed;
+      inset: 0;
+      background: white;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      animation: lightning 8s infinite;
+    }
+
+    @keyframes lightning {
+      0%, 94%, 98%, 100% { opacity: 0; }
+      95% { opacity: 0.3; }
+      97% { opacity: 0.1; }
+    }
+
+    /* Frame Borders */
+    .corner {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 2px solid var(--primary-blue);
+      z-index: 20;
+    }
+    .top-left { top: 30px; left: 30px; border-right: 0; border-bottom: 0; }
+    .top-right { top: 30px; right: 30px; border-left: 0; border-bottom: 0; }
+    .bottom-left { bottom: 30px; left: 30px; border-right: 0; border-top: 0; }
+    .bottom-right { bottom: 30px; right: 30px; border-left: 0; border-top: 0; }
+
   </style>
 </head>
 <body>
 
-  <div class="logo-container"></div>
-  <h1>PRO9 KAPIT-BISIG:<br><span style="font-size: 0.7em; color: #38bdf8;">Regionwide Program</span></h1>
+  <div class="grid-bg"></div>
+  <div class="scanline"></div>
+  <div class="thunder"></div>
 
+  <div class="corner top-left"></div>
+  <div class="corner top-right"></div>
+  <div class="corner bottom-left"></div>
+  <div class="corner bottom-right"></div>
+
+  <div class="opening-container">
+    <div class="logo-wrapper">
+      <div class="sonar sonar-1"></div>
+      <div class="sonar sonar-2"></div>
+      <div class="sonar sonar-3"></div>
+      <img src="https://i.ibb.co/vzG7Cnd/KAPIT-BISIG.png" class="logo-img" alt="KAPIT BISIG LOGO">
+    </div>
+
+    <h1 class="main-title">KAPIT-BISIG</h1>
+    <p class="sub-title">Regionwide Program Interface</p>
+
+    <button class="enter-btn" onclick="enterSystem()">Establish Connection</button>
+  </div>
+
+  <script>
+    function enterSystem() {
+      // "No Exit" logic: stay on site and change UI via JavaScript 
+      // or call your GS function to load the Dashboard
+      document.body.style.transition = "all 1s";
+      document.body.style.opacity = "0";
+      
+      setTimeout(() => {
+        // This keeps it in the same window/frame
+        google.script.run.withSuccessHandler(function(html){
+           document.open();
+           document.write(html);
+           document.close();
+        }).getDashboard(); 
+      }, 1000);
+    }
+  </script>
 </body>
 </html>
