@@ -1,226 +1,199 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <base target="_self">
-  <style>
-    :root {
-      --primary-blue: #0070ff;
-      --accent-cyan: #38bdf8;
-      --bg-dark: #020617;
-      --glow: rgba(0, 112, 255, 0.6);
-    }
+    <meta charset="UTF-8">
+    <base target="_self">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRO9 KAPIT-BISIG | SECURE ACCESS</title>
+    <style>
+        :root {
+            --primary: #0070ff;
+            --cyan: #38bdf8;
+            --bg: #020617;
+        }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            margin: 0; padding: 0;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      background: var(--bg-dark);
-      color: white;
-      font-family: 'Segoe UI', sans-serif;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+        /* --- LIGHTNING EFFECT --- */
+        .thunder-overlay {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            opacity: 0;
+            z-index: 100;
+            pointer-events: none;
+        }
 
-    /* --- TACTICAL GRID & SCANLINE --- */
-    .grid-bg {
-      position: fixed;
-      inset: 0;
-      background-image: 
-        linear-gradient(rgba(0, 112, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 112, 255, 0.05) 1px, transparent 1px);
-      background-size: 40px 40px;
-      z-index: 1;
-    }
+        @keyframes strike {
+            0% { opacity: 0; }
+            10% { opacity: 0.4; }
+            15% { opacity: 0.1; }
+            20% { opacity: 0.6; }
+            25% { opacity: 0; }
+            100% { opacity: 0; }
+        }
 
-    .scanline {
-      position: fixed;
-      inset: 0;
-      background: linear-gradient(to bottom, transparent, rgba(56, 189, 248, 0.03), transparent);
-      height: 10%;
-      width: 100%;
-      animation: scan 4s linear infinite;
-      z-index: 2;
-    }
+        /* --- BACKGROUND GRID --- */
+        .grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 112, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 112, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+        }
 
-    @keyframes scan { from { top: -10%; } to { top: 110%; } }
+        /* --- ENTRANCE CONTAINER --- */
+        #entrance-screen {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s;
+        }
 
-    /* --- CENTRAL HUB --- */
-    .opening-container {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      animation: zoomIn 1.5s cubic-bezier(0.22, 1, 0.36, 1);
-    }
+        .logo-box {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin-bottom: 30px;
+        }
 
-    @keyframes zoomIn {
-      from { transform: scale(0.8); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
+        .logo-main {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--primary));
+            animation: breathe 4s infinite ease-in-out;
+        }
 
-    /* --- LOGO WITH SONAR RINGS --- */
-    .logo-wrapper {
-      position: relative;
-      width: 180px;
-      height: 180px;
-      margin-bottom: 40px;
-    }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 10px var(--primary)); }
+            50% { transform: scale(1.05); filter: brightness(1.3) drop-shadow(0 0 25px var(--cyan)); }
+        }
 
-    .logo-img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 0 15px var(--primary-blue));
-      animation: breathe 3s infinite ease-in-out;
-      z-index: 5;
-      position: relative;
-    }
+        .sonar {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+            animation: sonar-pulse 4s infinite linear;
+            opacity: 0;
+        }
 
-    .sonar {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 100%; height: 100%;
-      border: 2px solid var(--accent-cyan);
-      border-radius: 50%;
-      animation: sonar-pulse 3s infinite linear;
-      opacity: 0;
-    }
-    .sonar-2 { animation-delay: 1s; }
-    .sonar-3 { animation-delay: 2s; }
+        @keyframes sonar-pulse {
+            0% { width: 100%; height: 100%; opacity: 0.8; }
+            100% { width: 350%; height: 350%; opacity: 0; }
+        }
 
-    @keyframes sonar-pulse {
-      0% { width: 100%; height: 100%; opacity: 0.6; }
-      100% { width: 300%; height: 300%; opacity: 0; }
-    }
+        .title {
+            font-size: 2.5rem;
+            letter-spacing: 15px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin: 0;
+            background: linear-gradient(to bottom, #fff, #64748b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-    @keyframes breathe {
-      0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 10px var(--primary-blue)); }
-      50% { transform: scale(1.05); filter: brightness(1.2) drop-shadow(0 0 25px var(--accent-cyan)); }
-    }
+        .btn-proceed {
+            margin-top: 50px;
+            padding: 15px 45px;
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--cyan);
+            font-weight: bold;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            transition: 0.3s;
+        }
 
-    /* --- TEXT STYLING --- */
-    .main-title {
-      font-size: 3rem;
-      font-weight: 900;
-      letter-spacing: 12px;
-      text-transform: uppercase;
-      background: linear-gradient(to bottom, #fff, #94a3b8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 10px;
-    }
+        .btn-proceed:hover {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 0 30px var(--primary);
+            transform: scale(1.1);
+        }
 
-    .sub-title {
-      font-size: 1rem;
-      letter-spacing: 6px;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      opacity: 0.8;
-      margin-bottom: 50px;
-    }
+        /* --- FULL VIEW IFRAME (HIDDEN BY DEFAULT) --- */
+        #main-app-frame {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+            display: none;
+            z-index: 50;
+        }
 
-    /* --- TACTICAL ENTER BUTTON --- */
-    .enter-btn {
-      position: relative;
-      padding: 15px 40px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--accent-cyan);
-      background: transparent;
-      border: 1px solid var(--primary-blue);
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 4px;
-      overflow: hidden;
-      transition: 0.4s;
-      clip-path: polygon(15% 0, 100% 0, 85% 100%, 0% 100%);
-    }
-
-    .enter-btn:hover {
-      background: var(--primary-blue);
-      color: white;
-      box-shadow: 0 0 30px var(--glow);
-      transform: scale(1.1);
-    }
-
-    /* Lightning Flash */
-    .thunder {
-      position: fixed;
-      inset: 0;
-      background: white;
-      opacity: 0;
-      pointer-events: none;
-      z-index: 100;
-      animation: lightning 8s infinite;
-    }
-
-    @keyframes lightning {
-      0%, 94%, 98%, 100% { opacity: 0; }
-      95% { opacity: 0.3; }
-      97% { opacity: 0.1; }
-    }
-
-    /* Frame Borders */
-    .corner {
-      position: fixed;
-      width: 40px; height: 40px;
-      border: 2px solid var(--primary-blue);
-      z-index: 20;
-    }
-    .top-left { top: 30px; left: 30px; border-right: 0; border-bottom: 0; }
-    .top-right { top: 30px; right: 30px; border-left: 0; border-bottom: 0; }
-    .bottom-left { bottom: 30px; left: 30px; border-right: 0; border-top: 0; }
-    .bottom-right { bottom: 30px; right: 30px; border-left: 0; border-top: 0; }
-
-  </style>
+        .hidden { opacity: 0; pointer-events: none; transform: scale(1.2) !important; }
+    </style>
 </head>
 <body>
 
-  <div class="grid-bg"></div>
-  <div class="scanline"></div>
-  <div class="thunder"></div>
+    <div class="thunder-overlay" id="thunder"></div>
+    <div class="grid"></div>
 
-  <div class="corner top-left"></div>
-  <div class="corner top-right"></div>
-  <div class="corner bottom-left"></div>
-  <div class="corner bottom-right"></div>
-
-  <div class="opening-container">
-    <div class="logo-wrapper">
-      <div class="sonar sonar-1"></div>
-      <div class="sonar sonar-2"></div>
-      <div class="sonar sonar-3"></div>
-      <img src="https://i.ibb.co/vzG7Cnd/KAPIT-BISIG.png" class="logo-img" alt="KAPIT BISIG LOGO">
+    <div id="entrance-screen">
+        <div class="logo-box">
+            <div class="sonar"></div>
+            <div class="sonar" style="animation-delay: 1.5s"></div>
+            <img src="KAPIT BISIG.png" class="logo-main" alt="Logo">
+        </div>
+        <h1 class="title">KAPIT-BISIG</h1>
+        <p style="letter-spacing: 5px; color: var(--cyan); font-size: 0.8rem;">REGIONWIDE PROGRAM COMMAND</p>
+        
+        <button class="btn-proceed" onclick="launchSystem()">Establish Connection</button>
     </div>
 
-    <h1 class="main-title">KAPIT-BISIG</h1>
-    <p class="sub-title">Regionwide Program Interface</p>
+    <iframe id="main-app-frame" src=""></iframe>
 
-    <button class="enter-btn" onclick="enterSystem()">Establish Connection</button>
-  </div>
+    <script>
+        // Random Thunder Logic
+        function triggerThunder() {
+            const strikeDelay = Math.random() * 8000 + 2000;
+            setTimeout(() => {
+                const thunder = document.getElementById('thunder');
+                thunder.style.animation = 'none';
+                void thunder.offsetWidth; // Trigger reflow
+                thunder.style.animation = 'strike 0.5s ease-out';
+                triggerThunder();
+            }, strikeDelay);
+        }
+        triggerThunder();
 
-  <script>
-    function enterSystem() {
-      // "No Exit" logic: stay on site and change UI via JavaScript 
-      // or call your GS function to load the Dashboard
-      document.body.style.transition = "all 1s";
-      document.body.style.opacity = "0";
-      
-      setTimeout(() => {
-        // This keeps it in the same window/frame
-        google.script.run.withSuccessHandler(function(html){
-           document.open();
-           document.write(html);
-           document.close();
-        }).getDashboard(); 
-      }, 1000);
-    }
-  </script>
+        // System Launch Logic
+        function launchSystem() {
+            const entrance = document.getElementById('entrance-screen');
+            const frame = document.getElementById('main-app-frame');
+            const targetUrl = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
+
+            // 1. Start transition
+            entrance.classList.add('hidden');
+
+            // 2. Load URL into iframe
+            frame.src = targetUrl;
+
+            // 3. Show Iframe
+            setTimeout(() => {
+                entrance.style.display = 'none';
+                frame.style.display = 'block';
+            }, 800);
+        }
+    </script>
 </body>
 </html>
