@@ -149,3 +149,70 @@
     </style>
 </head>
 <body>
+
+    <div id="police-fx"></div>
+    <div id="lightning-fx"></div>
+
+    <div id="cover-page">
+        <div class="logo-container" onclick="startSequence()">
+            <div class="radar"></div>
+            <div class="radar" style="animation-delay: 1s"></div>
+            <img src="KAPIT BISIG.png" class="logo-img" alt="KAPIT BISIG">
+        </div>
+
+        <div id="scanner-ui">
+            <div class="scan-line"></div>
+            <p style="margin-top: 10px; font-family: monospace;">INITIALIZING BIO-SYNC...</p>
+        </div>
+
+        <div id="title-block" class="title-text">
+            <h1>PRO9 COMMAND</h1>
+            <p style="font-size: 10px; opacity: 0.6; text-align: center;">Click to Establish Secure Node</p>
+        </div>
+    </div>
+
+    <iframe id="app-frame" src=""></iframe>
+
+    <script>
+        // Thunder FX Logic
+        function triggerThunder() {
+            const delay = Math.random() * 8000 + 4000;
+            setTimeout(() => {
+                const fx = document.getElementById('lightning-fx');
+                fx.style.animation = 'thunder-bolt 0.4s ease-out';
+                setTimeout(() => { fx.style.animation = ''; }, 400);
+                triggerThunder();
+            }, delay);
+        }
+        triggerThunder();
+
+        // Sequence Logic
+        function startSequence() {
+            const cover = document.getElementById('cover-page');
+            const title = document.getElementById('title-block');
+            const scanner = document.getElementById('scanner-ui');
+            const iframe = document.getElementById('app-frame');
+
+            // 1. Show Scanning UI
+            title.style.display = 'none';
+            scanner.style.display = 'block';
+
+            // 2. Pre-load Iframe
+            iframe.src = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
+
+            // 3. Slide Out and Show App (No Exit)
+            setTimeout(() => {
+                cover.style.transform = "translateY(-100%)";
+                setTimeout(() => {
+                    cover.style.display = 'none';
+                    iframe.style.display = 'block';
+                    // Keep police lights very faintly over the app for tactical feel
+                    const police = document.getElementById('police-fx');
+                    police.style.zIndex = "1001";
+                    police.style.opacity = "0.03";
+                }, 800);
+            }, 2500); // 2.5 second scan time
+        }
+    </script>
+</body>
+</html>
