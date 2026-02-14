@@ -4,40 +4,41 @@
     <meta charset="UTF-8">
     <base target="_self">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO9 KAPIT-BISIG</title>
+    <title>PRO9 TACTICAL PORTAL</title>
     <style>
         :root {
             --red: #ff0000;
             --blue: #0044ff;
-            --cyan: #38bdf8;
-            --dark: #000000;
+            --cyan: #00f2ff;
+            --bg: #000000;
         }
 
         body, html {
             margin: 0; padding: 0;
-            width: 100vw; height: 100vh;
-            background: var(--dark);
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
             overflow: hidden;
-            font-family: 'Segoe UI', sans-serif;
         }
 
-        /* --- POLICE FLUSHING (RED/BLUE) --- */
-        #police-lights {
+        /* --- POLICE LIGHT FLUSHING --- */
+        #police-fx {
             position: fixed;
             inset: 0;
-            z-index: 1;
-            opacity: 0.1;
+            z-index: 5;
             pointer-events: none;
-            animation: flush 0.6s infinite steps(2);
+            opacity: 0.12;
+            animation: police-strobe 0.6s infinite steps(2);
         }
 
-        @keyframes flush {
-            0% { background: var(--red); }
-            50% { background: var(--blue); }
+        @keyframes police-strobe {
+            0% { background: var(--red); box-shadow: inset 0 0 150px var(--red); }
+            50% { background: var(--blue); box-shadow: inset 0 0 150px var(--blue); }
         }
 
-        /* --- THUNDER EFFECT --- */
-        #lightning {
+        /* --- THUNDER/LIGHTNING --- */
+        #lightning-fx {
             position: fixed;
             inset: 0;
             background: white;
@@ -46,16 +47,16 @@
             pointer-events: none;
         }
 
-        @keyframes thunder-strike {
+        @keyframes thunder-bolt {
             0%, 90% { opacity: 0; }
-            92% { opacity: 0.6; }
-            94% { opacity: 0.2; }
-            96% { opacity: 1; }
+            92% { opacity: 0.4; }
+            93% { opacity: 0.1; }
+            95% { opacity: 0.8; }
             100% { opacity: 0; }
         }
 
-        /* --- ENTRANCE PAGE --- */
-        #cover {
+        /* --- ENTRANCE COVER --- */
+        #cover-page {
             position: absolute;
             inset: 0;
             display: flex;
@@ -63,108 +64,88 @@
             align-items: center;
             justify-content: center;
             z-index: 50;
-            transition: all 0.8s ease-in-out;
-            background: radial-gradient(circle, #001a33 0%, #000 80%);
+            transition: transform 1s cubic-bezier(0.85, 0, 0.15, 1);
+            background: radial-gradient(circle, #001020 0%, #000 100%);
         }
 
-        .logo-btn {
-            width: 280px;
+        .logo-container {
+            position: relative;
+            width: 260px; height: 260px;
             cursor: pointer;
-            filter: drop-shadow(0 0 15px var(--cyan));
-            transition: transform 0.3s;
-            z-index: 60;
         }
 
-        .logo-btn:active { transform: scale(0.9); }
+        .logo-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--cyan));
+            animation: breathe 3s infinite ease-in-out;
+            z-index: 10;
+            position: relative;
+        }
 
+        /* Radar pulses around logo */
         .radar {
             position: absolute;
-            width: 280px; height: 280px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%; height: 100%;
             border: 2px solid var(--cyan);
             border-radius: 50%;
-            animation: radar-pulse 2s infinite;
+            animation: radar-grow 2s infinite;
             pointer-events: none;
         }
 
-        @keyframes radar-pulse {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
+        @keyframes radar-grow {
+            0% { width: 100%; height: 100%; opacity: 1; }
+            100% { width: 300%; height: 300%; opacity: 0; }
         }
 
-        /* --- THE APP IFRAME (NO EXIT) --- */
-        #app-window {
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); filter: brightness(1) drop-shadow(0 0 10px var(--cyan)); }
+            50% { transform: scale(1.03); filter: brightness(1.2) drop-shadow(0 0 25px var(--cyan)); }
+        }
+
+        /* --- SCANNING OVERLAY --- */
+        #scanner-ui {
+            display: none;
+            position: absolute;
+            color: var(--cyan);
+            text-align: center;
+            z-index: 60;
+        }
+
+        .scan-line {
+            width: 300px; height: 2px;
+            background: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan);
+            position: relative;
+            animation: scan-move 1.5s infinite linear;
+        }
+
+        @keyframes scan-move {
+            0% { top: -150px; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 150px; opacity: 0; }
+        }
+
+        /* --- FULL SCREEN NO-EXIT IFRAME --- */
+        #app-frame {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             border: none;
-            display: none; /* Hidden until logo is clicked */
+            display: none;
             z-index: 1000;
         }
 
-        .system-text {
-            color: var(--cyan);
-            letter-spacing: 10px;
-            margin-top: 30px;
+        .title-text {
+            margin-top: 40px;
+            letter-spacing: 8px;
             text-transform: uppercase;
             font-weight: 900;
-            text-shadow: 0 0 10px var(--cyan);
+            color: #fff;
+            text-shadow: 0 0 15px var(--cyan);
         }
     </style>
 </head>
 <body>
-
-    <div id="police-lights"></div>
-    <div id="lightning"></div>
-
-    <div id="cover">
-        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
-            <div class="radar"></div>
-            <img src="KAPIT BISIG.png" class="logo-btn" onclick="openSystem()" alt="LOGO">
-        </div>
-        <h1 class="system-text">PRO9 COMMAND</h1>
-        <p style="color: white; opacity: 0.5; font-size: 10px; margin-top: 10px;">[ CLICK LOGO TO OVERRIDE ]</p>
-    </div>
-
-    <iframe id="app-window" src=""></iframe>
-
-    <script>
-        // 1. Lightning logic
-        function triggerLightning() {
-            const delay = Math.random() * 5000 + 3000;
-            setTimeout(() => {
-                const l = document.getElementById('lightning');
-                l.style.animation = 'thunder-strike 0.4s ease-out';
-                setTimeout(() => { l.style.animation = ''; }, 400);
-                triggerLightning();
-            }, delay);
-        }
-        triggerLightning();
-
-        // 2. No-Exit Logic
-        function openSystem() {
-            const cover = document.getElementById('cover');
-            const iframe = document.getElementById('app-window');
-            const lights = document.getElementById('police-lights');
-            
-            // Set the Source to your Web App
-            iframe.src = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
-
-            // Visual Transition
-            cover.style.transform = "translateY(-100%)";
-            cover.style.opacity = "0";
-            
-            setTimeout(() => {
-                cover.style.display = "none";
-                iframe.style.display = "block";
-                
-                // Keep the police lights pulsing VERY subtly over the app for effect
-                lights.style.zIndex = "1001";
-                lights.style.opacity = "0.03";
-            }, 800);
-        }
-
-        // Prevent Right Click (Optional Security)
-        document.addEventListener('contextmenu', event => event.preventDefault());
-    </script>
-</body>
-</html>
