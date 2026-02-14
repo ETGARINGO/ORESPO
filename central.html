@@ -4,208 +4,167 @@
     <meta charset="UTF-8">
     <base target="_self">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO9 TACTICAL COMMAND</title>
+    <title>PRO9 KAPIT-BISIG</title>
     <style>
         :root {
-            --police-red: #ff0000;
-            --police-blue: #0044ff;
+            --red: #ff0000;
+            --blue: #0044ff;
             --cyan: #38bdf8;
-            --bg: #00050a;
+            --dark: #000000;
         }
 
         body, html {
             margin: 0; padding: 0;
-            width: 100%; height: 100%;
-            background: var(--bg);
-            color: white;
-            font-family: 'Courier New', Courier, monospace;
+            width: 100vw; height: 100vh;
+            background: var(--dark);
             overflow: hidden;
+            font-family: 'Segoe UI', sans-serif;
         }
 
-        /* --- POLICE FLUSHING EFFECT (STROBE) --- */
-        .police-strobe {
+        /* --- POLICE FLUSHING (RED/BLUE) --- */
+        #police-lights {
             position: fixed;
             inset: 0;
-            pointer-events: none;
             z-index: 1;
-            opacity: 0.15;
-            animation: police-flash 0.8s infinite steps(2);
+            opacity: 0.1;
+            pointer-events: none;
+            animation: flush 0.6s infinite steps(2);
         }
 
-        @keyframes police-flash {
-            0% { background: var(--police-red); box-shadow: inset 0 0 100px var(--police-red); }
-            50% { background: var(--police-blue); box-shadow: inset 0 0 100px var(--police-blue); }
+        @keyframes flush {
+            0% { background: var(--red); }
+            50% { background: var(--blue); }
         }
 
-        /* --- THUNDER/LIGHTNING LAYER --- */
-        #lightning-layer {
+        /* --- THUNDER EFFECT --- */
+        #lightning {
             position: fixed;
             inset: 0;
-            background: #fff;
+            background: white;
             opacity: 0;
             z-index: 100;
             pointer-events: none;
         }
 
         @keyframes thunder-strike {
-            0%, 10%, 20% { opacity: 0; }
-            11% { opacity: 0.4; }
-            13% { opacity: 0.1; }
-            15% { opacity: 0.7; }
+            0%, 90% { opacity: 0; }
+            92% { opacity: 0.6; }
+            94% { opacity: 0.2; }
+            96% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
-        /* --- CENTRAL HUD --- */
-        #cover-page {
-            position: relative;
-            z-index: 10;
-            height: 100vh;
+        /* --- ENTRANCE PAGE --- */
+        #cover {
+            position: absolute;
+            inset: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle, rgba(0, 112, 255, 0.1) 0%, transparent 70%);
-            transition: transform 1s cubic-bezier(0.9, 0, 0.1, 1), opacity 0.8s;
+            z-index: 50;
+            transition: all 0.8s ease-in-out;
+            background: radial-gradient(circle, #001a33 0%, #000 80%);
         }
 
-        /* LOGO TACTICAL ANIMATION */
-        .logo-trigger {
-            position: relative;
+        .logo-btn {
             width: 280px;
-            height: 280px;
             cursor: pointer;
-            z-index: 10;
-        }
-
-        .logo-img {
-            width: 100%; height: 100%;
-            object-fit: contain;
             filter: drop-shadow(0 0 15px var(--cyan));
-            animation: glitch 4s infinite;
+            transition: transform 0.3s;
+            z-index: 60;
         }
 
-        /* SCANNING RING */
-        .scanner-ring {
+        .logo-btn:active { transform: scale(0.9); }
+
+        .radar {
             position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 110%; height: 110%;
+            width: 280px; height: 280px;
             border: 2px solid var(--cyan);
             border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 1s infinite linear;
+            animation: radar-pulse 2s infinite;
+            pointer-events: none;
         }
 
-        @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-        
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            1% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
-            2% { transform: translate(5px, -2px); filter: hue-rotate(180deg); }
-            3% { transform: translate(0); }
+        @keyframes radar-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
         }
 
-        /* --- TEXT STACK --- */
-        .tactical-text {
-            text-align: center;
-            margin-top: 30px;
-            text-shadow: 0 0 10px var(--cyan);
-        }
-
-        .status-bar {
-            width: 300px;
-            height: 4px;
-            background: #111;
-            margin-top: 15px;
-            border: 1px solid #333;
-            overflow: hidden;
-        }
-
-        .status-progress {
-            width: 40%;
-            height: 100%;
-            background: var(--cyan);
-            animation: pulse-load 2s infinite ease-in-out;
-        }
-
-        @keyframes pulse-load {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(300%); }
-        }
-
-        /* --- MAIN IFRAME (THE "NO EXIT" ZONE) --- */
-        #app-frame {
+        /* --- THE APP IFRAME (NO EXIT) --- */
+        #app-window {
             position: fixed;
             top: 0; left: 0;
-            width: 100%; height: 100%;
+            width: 100vw; height: 100vh;
             border: none;
-            display: none;
-            z-index: 200;
+            display: none; /* Hidden until logo is clicked */
+            z-index: 1000;
         }
 
-        .hidden-ui {
-            transform: translateY(-100vh);
-            opacity: 0;
+        .system-text {
+            color: var(--cyan);
+            letter-spacing: 10px;
+            margin-top: 30px;
+            text-transform: uppercase;
+            font-weight: 900;
+            text-shadow: 0 0 10px var(--cyan);
         }
     </style>
 </head>
 <body>
 
-    <div class="police-strobe"></div>
-    <div id="lightning-layer"></div>
+    <div id="police-lights"></div>
+    <div id="lightning"></div>
 
-    <div id="cover-page">
-        <div class="logo-trigger" onclick="engageSystem()">
-            <div class="scanner-ring"></div>
-            <img src="KAPIT BISIG.png" class="logo-img" alt="SECURE ACCESS">
+    <div id="cover">
+        <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+            <div class="radar"></div>
+            <img src="KAPIT BISIG.png" class="logo-btn" onclick="openSystem()" alt="LOGO">
         </div>
-        
-        <div class="tactical-text">
-            <h1 style="letter-spacing: 15px; margin:0;">PRO9 COMMAND</h1>
-            <p style="color: var(--cyan); font-size: 12px; margin-top: 5px;">STATUS: AWAITING BIOMETRIC OVERRIDE</p>
-            <div class="status-bar"><div class="status-progress"></div></div>
-        </div>
+        <h1 class="system-text">PRO9 COMMAND</h1>
+        <p style="color: white; opacity: 0.5; font-size: 10px; margin-top: 10px;">[ CLICK LOGO TO OVERRIDE ]</p>
     </div>
 
-    <iframe id="app-frame" src=""></iframe>
+    <iframe id="app-window" src=""></iframe>
 
     <script>
-        // 1. Thunder Strobe Logic (Entrance Only)
-        function startThunder() {
-            const delay = Math.random() * 6000 + 4000;
+        // 1. Lightning logic
+        function triggerLightning() {
+            const delay = Math.random() * 5000 + 3000;
             setTimeout(() => {
-                const layer = document.getElementById('lightning-layer');
-                layer.style.animation = 'none';
-                void layer.offsetWidth;
-                layer.style.animation = 'thunder-strike 0.5s ease-out';
-                startThunder();
+                const l = document.getElementById('lightning');
+                l.style.animation = 'thunder-strike 0.4s ease-out';
+                setTimeout(() => { l.style.animation = ''; }, 400);
+                triggerLightning();
             }, delay);
         }
-        startThunder();
+        triggerLightning();
 
-        // 2. Engagement Logic (No Exit Transition)
-        function engageSystem() {
-            const cover = document.getElementById('cover-page');
-            const frame = document.getElementById('app-frame');
-            const strobe = document.querySelector('.police-strobe');
-            const url = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
-
-            // Stop animations for transition
-            strobe.style.opacity = '0.05';
+        // 2. No-Exit Logic
+        function openSystem() {
+            const cover = document.getElementById('cover');
+            const iframe = document.getElementById('app-window');
+            const lights = document.getElementById('police-lights');
             
-            // Execute "No Exit" slide
-            cover.classList.add('hidden-ui');
+            // Set the Source to your Web App
+            iframe.src = "https://script.google.com/macros/s/AKfycbzldubjPB1EejgcN4xXf7zPcwKxvgWrR8MuADiH_Vk5a4hLAwu0A-Ex4yp8dHPWBEQu/exec";
 
-            // Set frame source
-            frame.src = url;
-
+            // Visual Transition
+            cover.style.transform = "translateY(-100%)";
+            cover.style.opacity = "0";
+            
             setTimeout(() => {
-                cover.style.display = 'none';
-                frame.style.display = 'block';
-                // Final Strobe adjustment to not distract from app
-                strobe.style.zIndex = "201"; 
-                strobe.style.opacity = "0.02"; 
-            }, 1000);
+                cover.style.display = "none";
+                iframe.style.display = "block";
+                
+                // Keep the police lights pulsing VERY subtly over the app for effect
+                lights.style.zIndex = "1001";
+                lights.style.opacity = "0.03";
+            }, 800);
         }
+
+        // Prevent Right Click (Optional Security)
+        document.addEventListener('contextmenu', event => event.preventDefault());
     </script>
 </body>
 </html>
